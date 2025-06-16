@@ -1,28 +1,24 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { addStackAction } from "@/lib/features/task/taskSlice";
-
 import Task from "./Task";
-import { title } from "process";
-import { json } from "stream/consumers";
+
 type taskType = {
   title: string;
   status: string;
-  id: number
+  id: number;
 };
 
-type newtaskType = {
+type newtsType = {
   title: string;
   id: number | undefined;
   status: string;
-}
-
+};
 
 type targetValue = {
   target: string;
@@ -30,10 +26,8 @@ type targetValue = {
 };
 
 const TaskAdder = () => {
-  const dispatch = useAppDispatch()
-  const { stack } = useAppSelector((state) => state.stack)
-
-
+  const dispatch = useAppDispatch();
+  const { stack } = useAppSelector((state) => state.stack);
 
   const [valueForm, setValueForm] = useState<taskType>({
     status: "",
@@ -48,43 +42,25 @@ const TaskAdder = () => {
     (e.type == "click" || e.keyCode == 13) && valueForm?.title && taskAdder();
   };
 
-
   const taskAdder = () => {
-    // stack.map((item , index)=>console.log(item , index))
-
-    // const copyList = [...stack];
-    // const indexs = copyList.map((item , index) => index);
-    // let max_id = Math.max([...indexs].length);
-    // const newtask: newtaskType = {
-    //   title: valueForm.title,
-    //   id: max_id,
-    //   status: status
-    // }
+    stack.map((item, index) => console.log(item, index));
 
     const copyList = [...stack];
-    const ids = copyList.map((item ) => item.id);
-    const indexs = copyList.map(( index) => index);
-    let max_id = Math.max(...ids.sort());
-    let nextid = max_id + 1;
-    let forwardId;
-    (!indexs.length || indexs.length==0) && (forwardId=1)
-    ||
-    (indexs.length) && (forwardId = nextid)
+    const ids = copyList.map((item) => item.id ?? 0);
+    const max_id = ids.length > 0 ? Math.max(...ids) : 0;
+    const forwardId = max_id + 1;
 
-
-    const newtask: newtaskType = {
+    const newtask: newtsType = {
       title: valueForm.title,
       id: forwardId,
-      status: status
-    }
+      status: status,
+    };
 
-    dispatch(addStackAction(newtask))
+    const updatedList = [...copyList, newtask];
+    localStorage.setItem("list", JSON.stringify(updatedList));
 
-
+    dispatch(addStackAction(newtask));
   };
-
-
-
 
   return (
     <>
@@ -130,7 +106,7 @@ const TaskAdder = () => {
             onChange={(e) => setStatus(e.target.value)}
             labelId="demo-simple-select-filled-label"
             id="demo-simple-select-filled"
-          > 
+          >
             <MenuItem value={"done"}>done</MenuItem>
             <MenuItem value={"doing"}>doing</MenuItem>
             <MenuItem value={"all"}>all</MenuItem>
@@ -138,19 +114,11 @@ const TaskAdder = () => {
 
           {/* <SelectBox value={status} setStatus={setStatus} /> */}
         </FormControl>
-
       </Stack>
       {stack.map((item, index) => {
-        return (
-          <Task
-            key={index}
-            Index={index}
-            Item={item}
-          />
-        )
-      })} 
-       {/* <TaskBox stack={stack} setStack={setStack} /> */}
-
+        return <Task key={index} Index={index} Item={item} />;
+      })}
+      {/* <TaskBox stack={stack} setStack={setStack} /> */}
     </>
   );
 };

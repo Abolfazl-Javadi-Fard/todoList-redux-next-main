@@ -1,43 +1,49 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-type newtaskType = {
+type newtsType = {
   title: string;
   id: number | undefined;
   status: string;
-}
-
-const storedStack = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("list") || "[]") : [];
-
-
+};
 
 export interface TaskState {
-  stack: Array<newtaskType>
+  stack: Array<newtsType>;
 }
 
 const initialState: TaskState = {
-  stack: storedStack
-}
+  stack: typeof window !== "undefined" 
+    ? JSON.parse(localStorage.getItem("list") ?? "[]")
+    : [],};
 
 export const taskSlice = createSlice({
-  name: 'stack',
+  name: "stack",
   initialState,
   reducers: {
-
-    addStackAction: (state, action: PayloadAction<newtaskType>) => {
-      const newStack = [...state.stack , action.payload];
-      state.stack = newStack;
-      localStorage.setItem("list",JSON.stringify(newStack))
+    addStackAction: (state: TaskState, action: PayloadAction<newtsType>) => {
+      console.log(state.stack);
+      localStorage.setItem(
+        "list",
+        JSON.stringify([...state.stack, action.payload])
+      );
+      const StorageItems = JSON.parse(localStorage.getItem("list") ?? "[]");
+      state.stack = StorageItems;
     },
 
-    deleteStackAction: (state, action: PayloadAction<number>) => {
-      const StorageItems = JSON.parse(localStorage.getItem("list"));
-      const FilteredStorage = StorageItems.filter(task => task.id !== action.payload)
-      localStorage.setItem("list", JSON.stringify(FilteredStorage))
+    deleteStackAction: (state: TaskState, action: PayloadAction<number>) => {
+      const StorageItems: newtsType[] = JSON.parse(
+        localStorage.getItem("list") ?? "[]"
+      );
+      const FilteredStorage = StorageItems.filter(
+        (task) => task.id !== action.payload
+      );
+      localStorage.setItem("list", JSON.stringify(FilteredStorage));
       state.stack = FilteredStorage;
-    }
+      console.log(FilteredStorage);
+      console.log(state.stack);
+    },
   },
-})
+});
 
-export const { addStackAction, deleteStackAction } = taskSlice.actions
+export const { addStackAction, deleteStackAction } = taskSlice.actions;
 
-export default taskSlice.reducer
+export default taskSlice.reducer;
